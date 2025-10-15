@@ -5,12 +5,12 @@ services:
     build: ./vulnapp
     container_name: vulnapp
     ports:
-      - "5001:5000"   # acceso en host:5001 -> contenedor:5000
+      - "5000:5000"   # acceso en host:5000 -> contenedor:5000
     restart: unless-stopped
 
   fixedapp:
     build: ./fixedapp
     container_name: fixedapp
     ports:
-      - "5002:5000"   # acceso en host:5002 -> contenedor:5000
+      - "5001:5001"   # acceso en host:5001 -> contenedor:5001
     restart: unless-stopped
