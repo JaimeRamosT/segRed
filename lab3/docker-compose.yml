@@ -3,14 +3,25 @@ version: "3.8"
 services:
   vulnapp:
     build: ./vulnapp
-    container_name: vulnapp
+    container_name: vulnapp_no_persist
     ports:
-      - "5000:5000"   # acceso en host:5000 -> contenedor:5000
+      - "5000:5000"
+    # NO volume para data (no persistir DB)
+    # Si quieres guardar logs en host, descomenta la parte de logs
+    # volumes:
+    #   - ./vulnapp/logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
 
   fixedapp:
     build: ./fixedapp
-    container_name: fixedapp
+    container_name: fixedapp_no_persist
     ports:
-      - "5001:5001"   # acceso en host:5001 -> contenedor:5001
+      - "5001:5001"
+    # NO volume para data (no persistir DB)
+    # volumes:
+    #   - ./fixedapp/logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
