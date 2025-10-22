@@ -33,11 +33,11 @@ def ping():
         log_request(logger, request, result="SUSPICIOUS", extra=reason)
         if reason.startswith("blocked"):
             return jsonify({"error": "IP temporalmente bloqueada"}), 429
-        return jsonify({"error": "parámetro sospechoso detectado"}), 400
+        return jsonify({"error": "parametro sospechoso detectado"}), 400
 
     if not HOST_RE.match(host):
         log_request(logger, request, result="VALIDATION_FAIL", extra="host invalid")
-        return jsonify({"error": "host inválido"}), 400
+        return jsonify({"error": "host invalido"}), 400
 
     try:
         proc = subprocess.run(["ping", "-c", "1", host], capture_output=True, text=True, timeout=5)
@@ -59,12 +59,12 @@ def user():
         log_request(logger, request, result="SUSPICIOUS", extra=reason)
         if reason.startswith("blocked"):
             return jsonify({"error": "IP temporalmente bloqueada"}), 429
-        return jsonify({"error": "parámetro sospechoso detectado"}), 400
+        return jsonify({"error": "parametro sospechoso detectado"}), 400
 
     username = request.args.get("username", "")
     if not username or len(username) > 100:
         log_request(logger, request, result="VALIDATION_FAIL", extra="username invalid")
-        return jsonify({"error": "username inválido"}), 400
+        return jsonify({"error": "username invalido"}), 400
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
