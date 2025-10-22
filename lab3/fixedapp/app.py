@@ -10,6 +10,7 @@ logger = get_logger("fixedapp", log_file="fixedapp.log")
 
 DB_PATH = "data/users.db"
 
+# Uso de whitelisting para el parámetro host
 HOST_RE = re.compile(r"^[A-Za-z0-9\.\-]+$")
 
 @app.before_request
