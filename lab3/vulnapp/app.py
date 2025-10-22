@@ -28,7 +28,6 @@ def ping():
     log_request(logger, request)
 
     host = request.args.get("host", "")
-    # NOTA: esta app es vulnerable; usamos getoutput para demostrar command injection
     try:
         output = subprocess.getoutput(f"ping -c 1 {host}")
         log_request(logger, request, result="PING_OK")
@@ -50,7 +49,6 @@ def user():
         if reason.startswith("blocked"):
             return jsonify({"error": "IP temporalmente bloqueada"}), 429
         # Si solo es sospechoso, podemos continuar pero lo registramos (a elección)
-        # Aquí decidimos continuar para observar la vulnerabilidad, pero ya quedó logueada.
     
     username = request.args.get("username", "")
     conn = sqlite3.connect(DB_PATH)

@@ -14,7 +14,6 @@ HOST_RE = re.compile(r"^[A-Za-z0-9\.\-]+$")
 
 @app.before_request
 def before():
-    # Bloqueo por IDS si aplica
     ip = client_ip_from_request(request)
     from log_utils import IDS_STATE
     blocked_until = IDS_STATE["blocked"].get(ip)
@@ -34,7 +33,6 @@ def ping():
         log_request(logger, request, result="SUSPICIOUS", extra=reason)
         if reason.startswith("blocked"):
             return jsonify({"error": "IP temporalmente bloqueada"}), 429
-        # En fixedapp podemos decidir rechazar solicitudes sospechosas
         return jsonify({"error": "parámetro sospechoso detectado"}), 400
 
     if not HOST_RE.match(host):
@@ -71,7 +69,7 @@ def user():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
-        # Parameterized query (safe)
+        # Parameterized query
         c.execute("SELECT id, username, fullname FROM users WHERE username = ?", (username,))
         rows = c.fetchall()
     except Exception as e:

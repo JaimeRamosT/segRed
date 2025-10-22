@@ -17,27 +17,22 @@ def get_logger(name="app", log_file="app.log", max_bytes=5*1024*1024, backup_cou
     return logger
 
 # Regex para detectar tokens típicos de inyección
-# Detecta: ' " ; , -- /* */ && | / \ * etc.
 suspicious_re = re.compile(r"(?:'|\"|;|,|--|/\*|\*/|\&\&|\||\\|\-|/|\*)")
 
 # IDS in-memory state (simple)
 IDS_STATE = {
-    # ip -> [timestamps_of_suspicious_requests]
     "attempts": {},
-    # ip -> blocked_until_timestamp
     "blocked": {}
 }
 
-# Parámetros configurables
+# Parametros configurables
 N_THRESHOLD = 5           # Número de intentos sospechosos para bloquear
 WINDOW_SECONDS = 60      # Ventana de tiempo para contar intentos
-BLOCK_SECONDS = 300      # Bloqueo temporal en segundos (ej. 5 minutos)
+BLOCK_SECONDS = 300      # Bloqueo temporal en segundos
 
 def client_ip_from_request(req):
-    # Obtén IP desde X-Forwarded-For si existe, si no remote_addr
     xff = req.headers.get("X-Forwarded-For", "")
     if xff:
-        # puede contener lista de IPs
         return xff.split(",")[0].strip()
     return req.remote_addr or "unknown"
 
@@ -49,16 +44,10 @@ def log_request(logger, req, result="OK", extra=None):
     logger.info(f"REQUEST ip={ip} endpoint={endpoint} params={params} user_agent=\"{ua}\" result={result} extra={extra}")
 
 def alert(logger, title, details):
-    # Notificación/alerta simple: lo logueamos como WARNING/ALERT. Podrías integrar email, webhook, etc.
+    # Notificación/alerta simple
     logger.warning(f"ALERT: {title} - {details}")
 
 def check_and_record_suspicious(logger, req):
-    """
-    Revisa todos los parámetros de query string y devuelve:
-      - (True, reason)  => si se detecta patrón sospechoso
-      - (False, None)    => si OK
-    Además actualiza el estado IDS por IP y bloquea si supera umbral.
-    """
     ip = client_ip_from_request(req)
 
     # Verificar si ya está bloqueada
@@ -87,7 +76,7 @@ def check_and_record_suspicious(logger, req):
         count = len(IDS_STATE["attempts"][ip])
 
         # alerta de detección
-        alert(logger, "Posible inyección detectada", {"ip": ip, "count_in_window": count, "reasons": reasons})
+        alert(logger, "Posible inyeccion", {"ip": ip, "count_in_window": count, "reasons": reasons})
 
         # bloquear si excede umbral
         if count >= N_THRESHOLD:
@@ -100,5 +89,4 @@ def check_and_record_suspicious(logger, req):
     return False, None
 
 def record_sql_error(logger, ip, query_snippet, error_str):
-    # Log detallado de errores SQL (útil para detectar scanning/escaneo)
     logger.error(f"SQL_ERROR ip={ip} query_snippet=\"{query_snippet}\" error=\"{error_str}\"")
